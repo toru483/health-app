@@ -2,87 +2,162 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>健康管理アプリ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康管理アプリ - ダッシュボード</title>
+    <!-- Google Fonts: 日本語を美しく表示 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; }
+    </style>
 </head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-4 text-blue-600">🏥 健康管理ダッシュボード</h1>
+<body class="bg-slate-50 min-h-screen pb-12">
+
+    <!-- 通知メッセージエリア -->
+    @if(session('success'))
+        <div class="max-w-4xl mx-auto mt-6 px-4">
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-sm flex items-center justify-between">
+                <div class="flex items-center">
+                    <svg class="h-5 w-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="text-green-500 hover:text-green-700">
+                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"></path></svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
         
-        <div class="grid grid-cols-2 gap-4">
-            <div class="border p-4 rounded bg-blue-50">
-                <h2 class="font-bold border-b mb-2">💊 服薬ログ</h2>
-                <p class="text-sm text-gray-600">最近の記録はありません</p>
+        <!-- ヘッダーセクション -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="text-3xl">🏥</span> 健康管理ダッシュボード
+                </h1>
+                <p class="text-slate-500 text-sm mt-1">今日の服用状況と健康ログを管理しましょう</p>
+            </div>
+            <a href="{{ route('hospitals.index') }}" class="inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all shadow-md hover:shadow-lg active:scale-95">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                新しい通院・処方を記録
+            </a>
+        </div>
+
+        <!-- 概要カード -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-3 opacity-10 text-blue-600">
+                    <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                </div>
+                <h2 class="font-bold text-slate-700 mb-2 flex items-center">💊 最近の服薬</h2>
+                <p class="text-sm text-slate-400">本日の服用済み: 0件</p>
+                <div class="mt-4 text-xs text-blue-600 font-bold hover:underline cursor-pointer">履歴を見る →</div>
             </div>
 
-            <div class="border p-4 rounded bg-green-50">
-                <h2 class="font-bold border-b mb-2">📊 測定ログ</h2>
-                <p class="text-sm text-gray-600">最近の記録はありません</p>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-3 opacity-10 text-green-600">
+                    <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                </div>
+                <h2 class="font-bold text-slate-700 mb-2 flex items-center">📊 測定ログ</h2>
+                <p class="text-sm text-slate-400">血圧・体重の未入力があります</p>
+                <div class="mt-4 text-xs text-green-600 font-bold hover:underline cursor-pointer">測定を入力する →</div>
             </div>
         </div>
 
-        <button class="mt-6 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
-            新しく記録する
-        </button>
-    </div>
+        <!-- お薬セクション -->
+        <section>
+            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                <span class="w-2 h-8 bg-blue-500 rounded-full mr-3"></span>
+                現在服用中のお薬
+            </h2>
 
-    <div class="container mx-auto p-6 max-w-4xl">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8 border-l-4 border-blue-500 pl-4">マイページ：現在のお薬</h1>
-
-        @forelse($prescriptions as $prescription)
-            <div class="mb-8 bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-                <!-- 処方箋ヘッダー -->
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-b">
-                    <div class="flex justify-between items-center">
+            @forelse($prescriptions as $prescription)
+                <div class="mb-8 bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-200 transition-hover hover:shadow-md">
+                    <!-- 処方箋ヘッダー -->
+                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2">
                         <div>
-                            <h2 class="text-lg font-bold text-blue-900">
-                                {{ $prescription->department->hospital->name }} 
-                                <span class="text-sm font-normal text-blue-700">（{{ $prescription->department->name }}）</span>
-                            </h2>
-                            <p class="text-sm text-gray-600">処方日：{{ $prescription->prescribed_date }}</p>
-                        </div>
-                        @if($prescription->next_visit_date)
-                            <div class="text-right">
-                                <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full">
-                                    次回予約：{{ $prescription->next_visit_date }}
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-lg font-bold text-slate-800">
+                                    {{ $prescription->department->hospital->name }}
+                                </h3>
+                                <span class="bg-white border border-slate-200 text-slate-600 text-xs px-2 py-0.5 rounded shadow-sm">
+                                    {{ $prescription->department->name }}
                                 </span>
+                            </div>
+                            <div class="flex items-center mt-1 text-xs text-slate-400">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                処方日：{{ is_object($prescription->prescribed_date) ? $prescription->prescribed_date->format('Y/m/d') : $prescription->prescribed_date }}
+                            </div>
+                        </div>
+                        
+                        @if($prescription->next_visit_date)
+                            <div class="bg-rose-50 text-rose-600 text-xs font-bold px-3 py-1.5 rounded-full flex items-center border border-rose-100">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                                次回予約：{{ is_object($prescription->next_visit_date) ? $prescription->next_visit_date->format('Y/m/d') : $prescription->next_visit_date }}
                             </div>
                         @endif
                     </div>
-                </div>
 
-                <!-- 薬のリスト -->
-                <div class="p-4">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="text-left text-xs text-gray-400 uppercase tracking-wider">
-                                <th class="pb-2">薬名</th>
-                                <th class="pb-2">1回量</th>
-                                <th class="pb-2">タイミング</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @foreach($prescription->medicines as $medicine)
-                                <tr>
-                                    <td class="py-3 font-semibold text-gray-700">{{ $medicine->name }}</td>
-                                    <td class="py-3 text-gray-600">{{ $medicine->dosage_amount }}{{ $medicine->dosage_unit }}</td>
-                                    <td class="py-3 text-gray-600">
-                                        <span class="bg-green-50 text-green-700 px-2 py-1 rounded text-sm font-medium">
-                                            {{ $medicine->frequency }}
-                                        </span>
-                                    </td>
+                    <!-- 薬のリスト -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
+                                    <th class="px-6 py-3">薬品名</th>
+                                    <th class="px-6 py-3">1回量</th>
+                                    <th class="px-6 py-3">服用時期</th>
+                                    <th class="px-6 py-3 text-right">服用チェック</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach($prescription->medicines as $medicine)
+                                    <tr class="hover:bg-slate-50/30 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-slate-700">{{ $medicine->name }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 text-slate-600 text-sm">
+                                            {{ $medicine->dosage_amount }}<span class="text-xs ml-0.5 text-slate-400">{{ $medicine->dosage_unit }}</span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                                                {{ $medicine->frequency }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                        @if($medicine->isTakenToday())
+                                            <button disabled class="bg-gray-300 text-gray-500 text-xs font-bold py-1.5 px-4 rounded-full cursor-not-allowed">
+                                                服用済み
+                                            </button>
+                                        @else
+                                            <form action="{{ route('medicine.take') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="medicine_id" value="{{ $medicine->id }}">
+                                                <button type="submit" class="...">飲んだ！</button>
+                                            </form>
+                                        @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        @empty
-            <div class="text-center py-12 bg-white rounded-xl shadow">
-                <p class="text-gray-400 italic">まだ処方箋が登録されていません。</p>
-                <a href="{{ route('hospitals.index') }}" class="mt-4 inline-block text-blue-500 hover:underline">病院を登録して始める</a>
-            </div>
-        @endforelse
-    </div>
+            @empty
+                <!-- データがない場合の表示（Empty State） -->
+                <div class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center shadow-sm">
+                    <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h3 class="text-slate-800 font-bold text-lg">処方箋がまだ登録されていません</h3>
+                    <p class="text-slate-500 mt-2 mb-6">病院で受け取った処方箋を登録すると、ここにお薬が表示されます。</p>
+                    <a href="{{ route('hospitals.index') }}" class="text-blue-600 font-bold hover:underline">病院を登録して始める →</a>
+                </div>
+            @endforelse
+        </section>
+
+    </main>
 </body>
 </html>

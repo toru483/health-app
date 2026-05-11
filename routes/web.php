@@ -33,3 +33,5 @@ Route::post('prescriptions', [PrescriptionController::class, 'store'])->name('pr
 // 薬（Medicine）登録機能の構築
 Route::get('medicines/create', [MedicineController::class, 'create'])->name('medicines.create');
 Route::post('medicines', [MedicineController::class, 'store'])->name('medicines.store');
+
+Route::post('/medicine/take', [DashboardController::class, 'takeMedicine'])->name('medicine.take');

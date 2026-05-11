@@ -3,16 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Medicine extends Model
 {
-    // 保存を許可するカラムを指定
     protected $fillable = [
-        'prescription_id',
         'name',
-        'dosage_amount',
-        'dosage_unit',
-        'frequency',
+        'hospital_name',
+        'department_name',
         'notes'
     ];
+
+    /**
+     * 服用履歴とのリレーション
+     */
+    public function takingLogs(): HasMany
+    {
+        return $this->hasMany(TakingLog::class);
+    }
+
+    /**
+     * 今日すでに服用したかを確認
+     */
+    public function isTakenToday(): bool
+    {
+        return $this->takingLogs()->today()->exists();
+    }
 }
