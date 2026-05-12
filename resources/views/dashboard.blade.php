@@ -9,6 +9,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Noto Sans JP', sans-serif; }
+        /* ハイライト時の左端のアクセント線 */
+        .highlight-line { border-left-width: 4px; border-left-color: #facc15; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
@@ -44,6 +46,19 @@
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 新しい通院・処方を記録
             </a>
+        </div>
+
+        <!-- 【追記】現在時刻の服用タイミング通知 -->
+        <div class="mb-8 p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-xl shadow-sm flex items-center gap-4">
+            <div class="bg-indigo-500 text-white p-2 rounded-lg shadow-inner">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+                <p class="text-indigo-900 font-bold">
+                    現在は <span class="text-xl text-indigo-600 underline decoration-indigo-300 underline-offset-4">{{ $slotName }}</span> の服用時間帯です
+                </p>
+                <p class="text-indigo-600 text-xs mt-0.5">該当するお薬が黄色くハイライトされています</p>
+            </div>
         </div>
 
         <!-- 概要カード -->
@@ -114,16 +129,35 @@
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @foreach($prescription->medicines as $medicine)
-                                    <tr class="hover:bg-slate-50/30 transition-colors">
+                                    @php
+                                        // 【追記】現在時刻と薬の登録タイミング(time_slots)を比較
+                                        // $medicine->time_slots には "1,3" のような文字列が入っている想定です
+                                        $isTargetTime = in_array($currentSlotId, explode(',', $medicine->time_slots));
+                                    @endphp
+                                    
+                                    <!-- 【追記】ハイライト条件に応じたクラス切り替え -->
+                                    <tr class="transition-colors {{ $isTargetTime ? 'bg-yellow-50 highlight-line' : 'hover:bg-slate-50/30' }}">
                                         <td class="px-6 py-4">
-                                            <div class="font-bold text-slate-700">{{ $medicine->name }}</div>
+                                            <div class="flex items-center gap-2">
+                                                <div class="font-bold {{ $isTargetTime ? 'text-yellow-900' : 'text-slate-700' }}">
+                                                    {{ $medicine->name }}
+                                                </div>
+                                                @if($isTargetTime)
+                                                    <span class="animate-pulse bg-yellow-400 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">NEXT</span>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 text-slate-600 text-sm">
                                             {{ $medicine->dosage_amount }}<span class="text-xs ml-0.5 text-slate-400">{{ $medicine->dosage_unit }}</span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
-                                                {{ $medicine->frequency }}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold {{ $isTargetTime ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-50 text-blue-700 border border-blue-100' }}">
+                                                @php
+                                                    // 数字のカンマ区切りを日本語名に変換
+                                                    $slots = explode(',', $medicine->time_slots);
+                                                    $names = array_map(fn($id) => [1=>'朝', 2=>'昼', 3=>'晩', 4=>'寝る前'][$id] ?? '随時', $slots);
+                                                @endphp
+                                                {{ implode('・', $names) }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-right">
@@ -135,7 +169,9 @@
                                             <form action="{{ route('medicine.take') }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="medicine_id" value="{{ $medicine->id }}">
-                                                <button type="submit" class="...">飲んだ！</button>
+                                                <button type="submit" class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold transition-all {{ $isTargetTime ? 'bg-yellow-500 hover:bg-yellow-600 text-white shadow-md' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm' }}">
+                                                    飲んだ！
+                                                </button>
                                             </form>
                                         @endif
                                         </td>

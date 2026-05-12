@@ -5,20 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TakingLog;
 use App\Models\Prescription; // ← 追加：バックスラッシュを消すため
+// ↓ ここを追加！
+use App\Services\HealthLogService;
 
 class DashboardController extends Controller
 {
     /**
      * ダッシュボード表示（お薬手帳メイン画面）
      */
-    public function index()
+    public function index(HealthLogService $service)
     {
-        // プロの技：Eager Loading（with）を使用してN+1問題を回避しているのは素晴らしいです！
-        $prescriptions = Prescription::with(['department.hospital', 'medicines.takingLogs' => function($query) {
-            $query->whereDate('taken_at', now()->toDateString());
-        }])->get();
+        $currentSlotId = $service->getCurrentSlotId();
+        $slotName = $service->getSlotName($currentSlotId);
+        
+        // Eager Loading (N+1問題対策)
+        $prescriptions = Prescription::with(['department.hospital', 'medicines.takingLogs'])->get();
 
-        return view('dashboard', compact('prescriptions'));
+        return view('dashboard', compact('prescriptions', 'currentSlotId', 'slotName'));
     }
 
     /**
