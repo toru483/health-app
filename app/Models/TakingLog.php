@@ -12,6 +12,12 @@ class TakingLog extends Model
         'time_slot',
     ];
 
+    // app/Models/TakingLog.php
+
+    protected $casts = [
+        'taken_at' => 'datetime', // 💡 これにより自動的にCarbonインスタンスに変換されます
+    ];
+
     // どの薬のログか
     public function medicine()
     {
