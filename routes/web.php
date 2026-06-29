@@ -6,6 +6,7 @@ use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\VitalController;
 use Illuminate\Support\Facades\Route;
 
 // 一覧画面を表示するルート
@@ -35,3 +36,8 @@ Route::get('medicines/create', [MedicineController::class, 'create'])->name('med
 Route::post('medicines', [MedicineController::class, 'store'])->name('medicines.store');
 
 Route::post('/medicine/take', [DashboardController::class, 'takeMedicine'])->name('medicine.take');
+
+// 体調管理（バイタル）一括登録画面のルート
+Route::get('/vitals', [VitalController::class, 'index'])->name('vitals.index');
+// ↓ これを追加
+Route::post('/vitals', [VitalController::class, 'store'])->name('vitals.store');
