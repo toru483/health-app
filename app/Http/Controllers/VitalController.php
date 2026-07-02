@@ -2,22 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Models\Vital;
 use Illuminate\Http\Request;
-use App\Models\Vital; // 💡 モデルをインポート
 
 class VitalController extends Controller
 {
     public function index()
     {
-        return view('vitals.index');
+        // 💡 Auth::id() の代わりに、仮で固定の「1」を指定して取得します
+        $vitals = Vital::where('user_id', 1)
+            ->latest()
+            ->take(10)
+            ->get();
+
+        $avgWeight = $vitals->avg('weight');
+        $avgBpHigh = $vitals->avg('blood_pressure_high');
+        $avgBpLow  = $vitals->avg('blood_pressure_low');
+        $avgSugar  = $vitals->avg('blood_sugar');
+
+        return view('vitals.index', compact('vitals', 'avgWeight', 'avgBpHigh', 'avgBpLow', 'avgSugar'));
     }
 
-    /**
-     * 【追加】体調データの一括保存処理
-     */
     public function store(Request $request)
     {
-        // 1. バリデーション（入力チェック）
         $validated = $request->validate([
             'weight' => 'nullable|numeric|between:10,200',
             'blood_pressure_high' => 'nullable|integer|between:40,250',
@@ -25,10 +33,11 @@ class VitalController extends Controller
             'blood_sugar' => 'nullable|integer|between:10,600',
         ]);
 
-        // 2. データベースへ保存
+        // 💡 ログインしていない状態なので、常にユーザーID「1」として保存します
+        $validated['user_id'] = 1;
+
         Vital::create($validated);
 
-        // 3. 服薬ダッシュボードへ戻り、成功メッセージを表示
-        return redirect()->route('dashboard')->with('success', '今日の体調データを記録しました！');
+        return redirect()->route('vitals.index')->with('success', '今日の体調データを記録しました！');
     }
 }

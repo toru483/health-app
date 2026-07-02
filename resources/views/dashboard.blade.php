@@ -36,11 +36,11 @@
                 <div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">データ管理</p>
                     <nav class="space-y-1">
-                        <a href="#medicine-management" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold bg-blue-50 text-blue-700 transition-colors">
+                        <a href="{{ route('medicines.create') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
                             <span>💊</span> お薬の管理
                         </a>
-                        <a href="#hospital-management" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
-                            <span>🏢</span> 病院の管理
+                        <a href="{{ route('hospitals.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
+                            <span>🏥</span> 病院の管理
                         </a>
                     </nav>
                 </div>

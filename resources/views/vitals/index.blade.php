@@ -23,8 +23,8 @@
         </a>
     </header>
 
-    <main class="max-w-2xl mx-auto px-4 py-10">
-        <div class="mb-8">
+    <main class="max-w-2xl mx-auto px-4 py-10 space-y-8">
+        <div>
             <h2 class="text-2xl font-bold text-slate-800">📝 今日の体調を一括登録</h2>
             <p class="text-slate-500 text-sm mt-1">体重、血圧、血糖値をまとめて記録し、健康状態を維持しましょう。</p>
         </div>
@@ -64,11 +64,62 @@
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" class="w-full py-3.5 bg-emerald-600 text-white font-bold rounded-xl shadow-md hover:bg-emerald-700 transition-all text-center font-bold active:scale-[0.99]">
+                    <button type="submit" class="w-full py-3.5 bg-emerald-600 text-white font-bold rounded-xl shadow-md hover:bg-emerald-700 transition-all text-center active:scale-[0.99]">
                         この内容で記録する ✨
                     </button>
                 </div>
             </form>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                <h3 class="font-bold text-slate-800">📊 過去10日間の登録履歴</h3>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-600">
+                    <thead class="text-xs uppercase bg-slate-50 text-slate-500 border-b border-slate-100">
+                        <tr>
+                            <th class="px-6 py-3 font-medium">日付</th>
+                            <th class="px-6 py-3 text-right font-medium">体重 (kg)</th>
+                            <th class="px-6 py-3 text-right font-medium">最高血圧</th>
+                            <th class="px-6 py-3 text-right font-medium">最低血圧</th>
+                            <th class="px-6 py-3 text-right font-medium">血糖値</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($vitals as $vital)
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
+                                {{ $vital->created_at->format('Y/m/d') }}
+                            </td>
+                            <td class="px-6 py-4 text-right">{{ $vital->weight ?? '-' }}</td>
+                            <td class="px-6 py-4 text-right">{{ $vital->blood_pressure_high ?? '-' }}</td>
+                            <td class="px-6 py-4 text-right">{{ $vital->blood_pressure_low ?? '-' }}</td>
+                            <td class="px-6 py-4 text-right text-slate-900 font-medium">{{ $vital->blood_sugar ?? '-' }}</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-400">
+                                登録されたデータがまだありません。今日の体調を記録してみましょう！
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                    
+                    @if($vitals->isNotEmpty())
+                    <tfoot class="bg-emerald-50/40 border-t-2 border-emerald-100 font-bold text-emerald-900">
+                        <tr>
+                            <td class="px-6 py-3.5 text-emerald-800">10日間平均</td>
+                            <td class="px-6 py-3.5 text-right">{{ $avgWeight ? number_format($avgWeight, 1) : '-' }}</td>
+                            <td class="px-6 py-3.5 text-right">{{ $avgBpHigh ? number_format($avgBpHigh, 1) : '-' }}</td>
+                            <td class="px-6 py-3.5 text-right">{{ $avgBpLow ? number_format($avgBpLow, 1) : '-' }}</td>
+                            <td class="px-6 py-3.5 text-right text-emerald-950">{{ $avgSugar ? number_format($avgSugar, 1) : '-' }}</td>
+                        </tr>
+                    </tfoot>
+                    @endif
+                </table>
+            </div>
         </div>
     </main>
 
