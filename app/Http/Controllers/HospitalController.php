@@ -48,8 +48,10 @@ class HospitalController extends Controller
      */
     public function show(Hospital $hospital)
     {
-        // 病院に紐づく受診科も一緒に取得する
-        $hospital->load('departments'); 
+        // 💡 プロの技術：N+1問題を回避するため、紐づく受診科（departments）を先行読み込み
+        $hospital->load('departments');
+
+        // resources/views/hospitals/show.blade.php を呼び出す
         return view('hospitals.show', compact('hospital'));
     }
 
