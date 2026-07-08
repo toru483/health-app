@@ -1,0 +1,12 @@
+{
+	"name": "Laravel Sail Application",
+	// 💡 読み込むファイルをメインの「compose.yaml」だけに絞ります
+	"dockerComposeFile": [
+		"../compose.yaml"
+	],
+	// 💡 接続先をメインのWebサーバー（laravel.test）にします
+	"service": "laravel.test",
+	// 💡 Laravel Sailがソースコードを配置するコンテナ内の場所を指定します
+	"workspaceFolder": "/var/www/html",
+	"features": {}
+}
