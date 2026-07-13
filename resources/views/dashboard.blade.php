@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>服薬管理アプリ - ダッシュボード</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { font-family: 'Noto Sans JP', sans-serif; }
-        .highlight-line { border-left-width: 4px; border-left-color: #facc15; }
+        .highlight-line { border-left: 4px solid #facc15; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800">
@@ -31,16 +31,14 @@
 
     <div class="flex min-h-[calc(100vh-73px)]">
         
+        <!-- サイドナビゲーション -->
         <aside class="w-64 bg-white border-r border-slate-200 p-6 hidden md:flex flex-col justify-between shrink-0">
             <div class="space-y-8">
                 <div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">データ管理</p>
                     <nav class="space-y-1">
-                        <a href="{{ route('medicines.create') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
-                            <span>💊</span> お薬の管理
-                        </a>
                         <a href="{{ route('hospitals.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
-                            <span>🏥</span> 病院の管理
+                            <span>🏥</span> 病院・受診科の管理
                         </a>
                     </nav>
                 </div>
@@ -60,11 +58,13 @@
             </div>
         </aside>
 
+        <!-- メインコンテンツ -->
         <main class="flex-1 p-6 lg:p-8 max-w-5xl mx-auto w-full">
             
+            <!-- フラッシュメッセージ -->
             @if(session('success'))
-                <div class="mb-6">
-                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-sm flex items-center justify-between">
+                <div class="mb-6 animate-fade-in">
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-xl shadow-sm flex items-center justify-between">
                         <div class="flex items-center">
                             <svg class="h-5 w-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -78,6 +78,7 @@
                 </div>
             @endif
 
+            <!-- 現在の時間帯ステータスバー -->
             <div class="mb-8 p-4 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-xl shadow-sm flex items-center gap-4">
                 <div class="bg-indigo-500 text-white p-2 rounded-lg shadow-inner">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -86,28 +87,27 @@
                     <p class="text-indigo-900 font-bold">
                         現在は <span class="text-xl text-indigo-600 underline decoration-indigo-300 underline-offset-4">{{ $slotName }}</span> の服用時間帯です
                     </p>
-                    <p class="text-indigo-600 text-xs mt-0.5">該当するお薬が黄色くハイライトされています</p>
+                    <p class="text-indigo-600 text-xs mt-0.5">該当するお薬が黄色くハイライトされ、優先表示されます</p>
                 </div>
             </div>
 
+            <!-- セクション1：現在服用中のお薬（処方箋ベースのドリルダウン表示） -->
             <section class="mb-10">
                 <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
                     <span class="w-1.5 h-6 bg-blue-500 rounded-full mr-2.5"></span>
-                    現在服用中のお薬
+                    登録中のお薬一覧
                 </h2>
 
                 @forelse($prescriptions as $prescription)
-                    <div class="mb-6 bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-200 transition-hover hover:shadow-md">
+                    <div class="mb-6 bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-200 hover:shadow-md transition-shadow">
                         <div class="bg-slate-50/80 px-6 py-3 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-sm font-bold text-slate-800">
-                                        {{ $prescription->department->hospital->name }}
-                                    </h3>
-                                    <span class="bg-white border border-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded shadow-sm">
-                                        {{ $prescription->department->name }}
-                                    </span>
-                                </div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-slate-800">
+                                    {{ $prescription->department->hospital->name }}
+                                </h3>
+                                <span class="bg-white border border-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded shadow-sm">
+                                    {{ $prescription->department->name }}
+                                </span>
                             </div>
                             @if($prescription->next_visit_date)
                                 <div class="bg-rose-50 text-rose-600 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center border border-rose-100">
@@ -120,16 +120,26 @@
                             <table class="w-full">
                                 <thead>
                                     <tr class="text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/30 border-b border-slate-100">
-                                        <th class="px-6 py-2.5">薬品名</th>
-                                        <th class="px-6 py-2.5">1回量</th>
-                                        <th class="px-6 py-2.5">服用時期</th>
-                                        <th class="px-6 py-2.5 text-right">服用チェック</th>
+                                        <th class="px-6 py-2.5">お薬名</th>
+                                        <th class="px-6 py-2.5">1-回量</th>
+                                        <th class="px-6 py-2.5">服用タイミング</th>
+                                        <th class="px-6 py-2.5 text-right">アクション</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach($prescription->medicines as $medicine)
                                         @php
-                                            $isTargetTime = in_array($currentSlotId, explode(',', $medicine->time_slots));
+                                            // コントローラーの英名キーと、お薬の持つBooleanカラムを判定
+                                            $isTargetTime = ($currentSlotId === 'morning' && $medicine->timing_morning) ||
+                                                            ($currentSlotId === 'noon' && $medicine->timing_noon) ||
+                                                            ($currentSlotId === 'night' && $medicine->timing_night) ||
+                                                            ($currentSlotId === 'before_sleep' && $medicine->timing_before_sleep);
+
+                                            // 💡 メモリ負荷を最小限に抑えるプロの判定ロジック
+                                            // 今日、かつ「現在の時間帯（morning等）」にすでに服用済みログが存在するかをチェック
+                                            $hasTakenToday = $medicine->takingLogs->contains(function($log) use ($currentSlotId) {
+                                                return \Carbon\Carbon::parse($log->taken_at)->isToday() && $log->time_slot === $currentSlotId;
+                                            });
                                         @endphp
                                         
                                         <tr class="transition-colors {{ $isTargetTime ? 'bg-yellow-50/60 highlight-line' : 'hover:bg-slate-50/30' }}">
@@ -138,37 +148,39 @@
                                                     <div class="font-bold text-sm {{ $isTargetTime ? 'text-yellow-900' : 'text-slate-700' }}">
                                                         {{ $medicine->name }}
                                                     </div>
-                                                    @if($isTargetTime)
+                                                    @if($isTargetTime && !$hasTakenToday)
                                                         <span class="animate-pulse bg-yellow-400 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-black">NEXT</span>
                                                     @endif
                                                 </div>
+                                                @if($medicine->notes)
+                                                    <p class="text-xs text-slate-400 mt-0.5">{{ $medicine->notes }}</p>
+                                                @endif
                                             </td>
-                                            <td class="px-6 py-3 text-slate-600 text-xs">
-                                                {{ $medicine->dosage_amount }}<span class="text-[10px] ml-0.5 text-slate-400">{{ $medicine->dosage_unit }}</span>
+                                            <td class="px-6 py-3 text-slate-600 text-xs font-medium">
+                                                {{ $medicine->dosage }}
                                             </td>
                                             <td class="px-6 py-3">
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold {{ $isTargetTime ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-50 text-blue-700 border border-blue-100' }}">
-                                                    @php
-                                                        $slots = explode(',', $medicine->time_slots);
-                                                        $names = array_map(fn($id) => [1=>'朝', 2=>'昼', 3=>'晩', 4=>'寝る前'][$id] ?? '随時', $slots);
-                                                    @endphp
-                                                    {{ implode('・', $names) }}
-                                                </span>
+                                                <div class="flex gap-1">
+                                                    @if($medicine->timing_morning) <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">朝</span> @endif
+                                                    @if($medicine->timing_noon) <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">昼</span> @endif
+                                                    @if($medicine->timing_night) <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">夜</span> @endif
+                                                    @if($medicine->timing_before_sleep) <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">就寝前</span> @endif
+                                                </div>
                                             </td>
                                             <td class="px-6 py-3 text-right">
-                                            @if($medicine->isTakenToday())
-                                                <button disabled class="bg-gray-200 text-gray-400 text-xs font-medium py-1 px-3 rounded-full cursor-not-allowed">
-                                                    服用済み
-                                                </button>
-                                            @else
-                                                <form action="{{ route('medicine.take') }}" method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="medicine_id" value="{{ $medicine->id }}">
-                                                    <button type="submit" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold transition-all {{ $isTargetTime ? 'bg-yellow-500 hover:bg-yellow-600 text-white shadow-sm' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm' }}">
-                                                        飲んだ！
+                                                @if($hasTakenToday)
+                                                    <button disabled class="bg-slate-200 text-slate-400 text-xs font-medium py-1 px-3 rounded-full cursor-not-allowed">
+                                                        服用済み ✓
                                                     </button>
-                                                </form>
-                                            @endif
+                                                @else
+                                                    <form action="{{ route('medicine.take') }}" method="POST" class="inline">
+                                                        @csrf
+                                                        <input type="hidden" name="medicine_id" value="{{ $medicine->id }}">
+                                                        <button type="submit" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold transition-transform active:scale-95 shadow-sm text-white {{ $isTargetTime ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-600 hover:bg-blue-700' }}">
+                                                            飲んだ！
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -178,11 +190,12 @@
                     </div>
                 @empty
                     <div class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center shadow-sm">
-                        <p class="text-slate-500 text-sm">処方箋がまだ登録されていません。</p>
+                        <p class="text-slate-500 text-sm">処方薬が登録されていません。<a href="{{ route('hospitals.index') }}" class="text-teal-600 font-bold underline ml-1">病院詳細から登録</a>してください。</p>
                     </div>
                 @endforelse
             </section>
 
+            <!-- セクション2：本日の服用履歴（タイムラインログ） -->
             <section class="mt-12">
                 <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
                     <span class="w-1.5 h-6 bg-emerald-500 rounded-full mr-2.5"></span>
@@ -194,12 +207,15 @@
                         <div class="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-white"></div>
                         
                         <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded mr-2">
-                                    {{ $log->taken_at->format('H:i') }}
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                                    {{ \Carbon\Carbon::parse($log->taken_at)->format('H:i') }}
                                 </span>
                                 <span class="font-bold text-slate-700 text-sm">
                                     {{ $log->medicine->name ?? '削除されたお薬' }}
+                                </span>
+                                <span class="text-xs text-slate-400">
+                                    ({{ $log->medicine->prescription->department->hospital->name ?? '' }})
                                 </span>
                             </div>
                             <div class="text-xs text-emerald-600 font-bold flex items-center gap-1">
