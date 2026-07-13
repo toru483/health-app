@@ -29,3 +29,9 @@ Route::get('prescriptions/create', [PrescriptionController::class, 'create'])->n
 Route::post('prescriptions', [PrescriptionController::class, 'store'])->name('prescriptions.store');
 Route::get('medicines/create', [MedicineController::class, 'create'])->name('medicines.create');
 Route::post('medicines', [MedicineController::class, 'store'])->name('medicines.store');
+
+// 受診科の個別詳細表示ルートを追加
+Route::get('/departments/{department}', [DepartmentController::class, 'show'])->name('departments.show');
+
+// 処方箋登録用のルートを追加
+Route::post('/prescriptions', [PrescriptionController::class, 'store'])->name('prescriptions.store');

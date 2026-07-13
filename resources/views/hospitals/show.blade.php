@@ -90,9 +90,9 @@
                                         <p class="text-xs text-slate-400 mt-1">処方箋データ: 未連携</p>
                                     </div>
                                     <!-- 💡 将来、ここに「処方箋を追加する（Medicinesの追加画面へ）」ボタンを配置します -->
-                                    <button class="text-xs font-bold text-blue-600 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-colors">
+                                    <a href="{{ route('departments.show', $department->id) }}" class="text-xs font-bold text-blue-600 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-colors inline-block">
                                         データ管理
-                                    </button>
+                                    </a>
                                 </div>
                             @endforeach
                         </div>

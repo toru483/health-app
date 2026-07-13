@@ -25,4 +25,12 @@ class DepartmentController extends Controller
         return redirect()->route('hospitals.show', $request->hospital_id)
                         ->with('success', "受診科「{$request->name}」を登録しました！✨");
     }
+
+    public function show(Department $department)
+    {
+        // 💡 プロの技術：受診科に紐づく「処方箋（prescriptions）」と、その親である「病院（hospital）」を先行読み込み
+        $department->load(['hospital', 'prescriptions']);
+
+        return view('departments.show', compact('department'));
+    }
 }
