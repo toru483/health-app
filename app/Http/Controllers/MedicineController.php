@@ -1,47 +1,69 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Prescription;
 use App\Models\Medicine;
+use App\Models\Prescription;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class MedicineController extends Controller
 {
-    public function create(Request $request)
+    /**
+     * お薬登録画面の表示
+     * 💡 どの「処方箋」にお薬を追加するのか、文脈（親ID）を確実に引き継ぐ
+     */
+    public function create(Request $request): View
     {
-        $prescription_id = $request->query('prescription_id');
+        // 1. クエリパラメータから親の prescription_id を取得
+        $prescriptionId = $request->query('prescription_id');
 
-        // 1. ガード節：ID未指定時は一覧へ
-        if (!$prescription_id) {
-            return redirect()->route('hospitals.index')->with('error', '処方箋IDが指定されていません。');
+        // 2. 親データが存在するか、N+1問題を回避しつつ関連する診療科・病院まで一括ロード（Eager Loading）
+        // 💡 ガード節による異常系の早期排除
+        if (!$prescriptionId) {
+            abort(400, '処方箋IDが指定されていません。');
         }
 
-        // 2. Eager Loadingによる高効率なデータ取得
-        $prescription = Prescription::with(['department.hospital', 'medicines'])->find($prescription_id);
-
-        // 3. データ不在時のハンドリング
-        if (!$prescription) {
-            return redirect()->route('hospitals.index')->with('error', '指定された処方箋データが見つかりませんでした。');
-        }
+        $prescription = Prescription::with(['department.hospital'])->findOrFail($prescriptionId);
 
         return view('medicines.create', compact('prescription'));
     }
 
-    public function store(Request $request)
+    /**
+     * お薬データの堅牢なバリデーション＆保存処理
+     */
+    public function store(Request $request): RedirectResponse
     {
-        // 💡 time_slots を配列またはカンマ区切りで受ける想定へ拡張可能に
+        // 1. 実务レベルの厳格なバリデーション
+        // 💡 Boolean型（チェックボックス）の入力値は、存在しない場合に false に丸める前処理（ハッキング・不正値対策）
         $validated = $request->validate([
-            'prescription_id' => 'required|exists:prescriptions,id',
-            'name' => 'required|string|max:255',
-            'dosage_amount' => 'required|integer|min:1',
-            'dosage_unit' => 'required|string|max:50',
-            'time_slots' => 'required|string', // '1,2,3' (朝昼晩) のような形
+            'prescription_id'     => ['required', 'exists:prescriptions,id'],
+            'name'                => ['required', 'string', 'max:255'],
+            'dosage'              => ['required', 'string', 'max:100'],
+            'timing_morning'      => ['nullable', 'boolean'],
+            'timing_noon'         => ['nullable', 'boolean'],
+            'timing_night'        => ['nullable', 'boolean'],
+            'timing_before_sleep' => ['nullable', 'boolean'],
+            'notes'               => ['nullable', 'string', 'max:1000'],
         ]);
 
-        Medicine::create($validated);
+        // 2. チェックボックスの未選択（リクエストに含まれない）に対応するためのデータ整形
+        $data = array_merge($validated, [
+            'timing_morning'      => $request->has('timing_morning'),
+            'timing_noon'         => $request->has('timing_noon'),
+            'timing_night'        => $request->has('timing_night'),
+            'timing_before_sleep' => $request->has('timing_before_sleep'),
+        ]);
 
-        return redirect()->route('medicines.create', ['prescription_id' => $request->prescription_id])
-                        ->with('success', 'お薬を追加しました！✨');
+        // 3. 安全な一括代入（Mass Assignment）の実行
+        Medicine::create($data);
+
+        // 4. UX（ユーザー体験）の最適化：登録完了後は、親である「処方箋が紐づく受診科の詳細画面」等へスマートに戻す
+        return redirect()
+            ->route('departments.show', $request->input('department_id'))
+            ->with('success', 'お薬（' . $data['name'] . '）を正常に登録しました。');
     }
 }
